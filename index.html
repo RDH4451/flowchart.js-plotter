@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Plotter: flowchart.js 绘图台。编写流程图语法，实时查看图纸绘制，并导出高清 SVG 或 PNG。">
+  <title>Plotter: flowchart.js 绘图台</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="1"/><path d="M9 3.5v17M15 3.5v17M3.5 9h17M3.5 15h17"/></symbol>
+    <symbol id="i-frame" viewBox="0 0 24 24"><path d="M8 3H4a1 1 0 0 0-1 1v4M16 3h4a1 1 0 0 1 1 1v4M8 21H4a1 1 0 0 1-1-1v-4M16 21h4a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M3 9V4a1 1 0 0 1 1-1h5M15 3h5a1 1 0 0 1 1 1v5M21 15v5a1 1 0 0 1-1 1h-5M9 21H4a1 1 0 0 1-1-1v-5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h8M18 7h2M4 17h2M12 17h8"/><circle cx="15" cy="7" r="2.5"/><circle cx="9" cy="17" r="2.5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v11M8 10l4 4 4-4M5 20h14"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5zM8 7.5h8M8 11.5h8"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 3v10M8 9l4 4 4-4M5 20h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="1"/><path d="M15 5H5a1 1 0 0 0-1 1v10"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-6 6-3-3-4 4"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1M3 4v5h5"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
+  </svg>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 20L8.5 5l6 14L20.5 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="8.5" cy="5" r="1.9" fill="currentColor"/>
+        </svg>
+        <span class="brand-name">PLOTTER</span>
+        <span class="brand-tag">flowchart.js</span>
+      </div>
+
+      <div class="doc-meta">
+        <input id="docTitle" class="doc-title" value="未命名流程图" aria-label="图纸标题" spellcheck="false" maxlength="80">
+        <span class="save-state" id="saveState"><i></i><span>已保存</span></span>
+      </div>
+
+      <div class="topbar-actions">
+        <button type="button" class="btn ghost" id="examplesBtn" aria-label="示例" aria-expanded="false" aria-controls="examplesPop">
+          <svg class="icon"><use href="#i-book"/></svg><span class="label">示例</span>
+          <svg class="icon chevron"><use href="#i-chevron"/></svg>
+        </button>
+        <button type="button" class="btn ghost" id="syntaxBtn" aria-label="语法参考">
+          <svg class="icon"><use href="#i-code"/></svg><span class="label">语法</span>
+        </button>
+        <button type="button" class="btn ghost" id="styleBtn" aria-label="样式选项" aria-expanded="false" aria-controls="stylePop">
+          <svg class="icon"><use href="#i-sliders"/></svg><span class="label">样式</span>
+        </button>
+        <span class="topbar-divider" aria-hidden="true"></span>
+        <button type="button" class="btn primary" id="exportBtn" aria-label="导出绘图">
+          <svg class="icon"><use href="#i-download"/></svg><span class="label">导出</span>
+        </button>
+      </div>
+
+      <div class="mobile-switch" role="group" aria-label="工作区视图">
+        <button type="button" data-pane="source" aria-label="显示源码编辑器" aria-pressed="true">
+          <svg class="icon"><use href="#i-code"/></svg><span>代码</span>
+        </button>
+        <button type="button" data-pane="sheet" aria-label="显示绘图图纸" aria-pressed="false">
+          <svg class="icon"><use href="#i-image"/></svg><span>图纸</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="workspace" id="workspace">
+      <section class="pane editor-pane" id="editorPane" aria-label="源码编辑器">
+        <div class="pane-head">
+          <div class="pane-title">
+            <span class="pane-eyebrow">源码</span>
+            <span class="pane-sub">flowchart.js 语法</span>
+          </div>
+          <div class="pane-actions">
+            <button type="button" class="icon-btn" id="insertBtn" title="插入节点" aria-label="插入节点" aria-expanded="false" aria-controls="insertPop">
+              <svg class="icon"><use href="#i-plus"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="openBtn" title="打开文件" aria-label="打开 .flow 文件">
+              <svg class="icon"><use href="#i-folder"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="downloadSourceBtn" title="下载源码" aria-label="下载源码文件">
+              <svg class="icon"><use href="#i-save"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="editor-body" id="editorBody">
+          <div class="gutter" id="gutter" aria-hidden="true"></div>
+          <div class="code-wrap" id="codeWrap">
+            <div class="active-line" id="activeLine" aria-hidden="true"></div>
+            <pre class="code-highlight" id="highlight" aria-hidden="true"></pre>
+            <textarea class="code-input" id="editor" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" wrap="off" aria-label="flowchart.js 源码"></textarea>
+          </div>
+        </div>
+
+        <div class="diagnostics" id="diagnostics" hidden>
+          <div class="diag-head">
+            <span class="diag-count" id="diagCount"></span>
+            <button type="button" class="icon-btn tiny" id="diagDismiss" aria-label="隐藏提示">
+              <svg class="icon"><use href="#i-x"/></svg>
+            </button>
+          </div>
+          <ul class="diag-list" id="diagList"></ul>
+        </div>
+      </section>
+
+      <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" aria-label="调整源码与图纸区域的宽度" aria-valuemin="26" aria-valuemax="68" aria-valuenow="42" tabindex="0"></div>
+
+      <section class="pane preview-pane" id="previewPane" aria-label="绘图图纸">
+        <div class="pane-head">
+          <div class="pane-title">
+            <span class="pane-eyebrow">图纸</span>
+            <span class="pane-sub" id="themeLabel">制图</span>
+            <span class="stale-badge" id="staleBadge" hidden>待更新</span>
+          </div>
+          <div class="pane-actions">
+            <button type="button" class="icon-btn" id="gridBtn" title="切换网格" aria-label="切换网格" aria-pressed="true">
+              <svg class="icon"><use href="#i-grid"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="frameBtn" title="切换图纸边框" aria-label="切换图纸边框" aria-pressed="true">
+              <svg class="icon"><use href="#i-frame"/></svg>
+            </button>
+            <span class="pane-actions-divider" aria-hidden="true"></span>
+            <button type="button" class="icon-btn" id="zoomOut" title="缩小" aria-label="缩小">
+              <svg class="icon"><use href="#i-minus"/></svg>
+            </button>
+            <button type="button" class="zoom-label" id="zoomReset" title="重置为 100%" aria-label="重置为 100%">100%</button>
+            <button type="button" class="icon-btn" id="zoomIn" title="放大" aria-label="放大">
+              <svg class="icon"><use href="#i-plus"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="fitBtn" title="适应图纸" aria-label="适应图纸">
+              <svg class="icon"><use href="#i-fit"/></svg>
+            </button>
+            <span class="pane-actions-divider" aria-hidden="true"></span>
+            <button type="button" class="icon-btn" id="undoBtn" title="撤销 (Ctrl+Z)" aria-label="撤销" disabled>
+              <svg class="icon"><use href="#i-undo"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="redoBtn" title="重做 (Ctrl+Y)" aria-label="重做" disabled>
+              <svg class="icon"><use href="#i-redo"/></svg>
+            </button>
+            <button type="button" class="icon-btn" id="layoutResetBtn" title="重置手动调整与隐藏连线" aria-label="重置手动调整与隐藏连线" disabled>
+              <svg class="icon"><use href="#i-reset"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="desk">
+          <div class="sheet" id="sheet" data-theme="drafting" data-stale="false">
+            <div class="sheet-grid" id="viewport">
+              <div class="diagram" id="diagram"></div>
+
+              <div class="sheet-empty" id="sheetEmpty" hidden>
+                <div class="empty-mark" aria-hidden="true">
+                  <svg viewBox="0 0 48 48"><path d="M8 38L19 9l10 26L40 7" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="19" cy="9" r="2" fill="currentColor"/></svg>
+                </div>
+                <p class="empty-title" id="emptyTitle">还没有绘图</p>
+                <p class="empty-body" id="emptyBody">在源码面板中编写流程，或打开一个示例了解语法。</p>
+                <button type="button" class="btn ghost small" id="emptyExampleBtn">载入示例</button>
+              </div>
+
+              <span class="reg tl" aria-hidden="true"></span>
+              <span class="reg tr" aria-hidden="true"></span>
+              <span class="reg bl" aria-hidden="true"></span>
+              <span class="reg br" aria-hidden="true"></span>
+            </div>
+
+            <div class="titleblock" aria-hidden="true">
+              <div class="tb-cell tb-title"><span>图纸</span><strong id="tbTitle">未命名流程图</strong></div>
+              <div class="tb-cell"><span>节点</span><strong id="tbNodes">0</strong></div>
+              <div class="tb-cell"><span>连线</span><strong id="tbLinks">0</strong></div>
+              <div class="tb-cell"><span>比例</span><strong id="tbScale">100%</strong></div>
+              <div class="tb-cell tb-sheet"><span>页码</span><strong>01 / 01</strong></div>
+              <div class="tb-cell tb-date"><span>日期</span><strong id="tbDate">—</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="statusbar">
+      <div class="status-group">
+        <span class="status-item"><span class="status-key">节点</span><span id="statNodes">0</span></span>
+        <span class="status-item"><span class="status-key">连线</span><span id="statLinks">0</span></span>
+        <span class="status-item" id="statIssues"><i class="dot"></i><span>无问题</span></span>
+      </div>
+      <div class="status-group status-right">
+        <span class="status-item" id="statRender">就绪</span>
+        <span class="status-item" id="statCursor">行 1, 列 1</span>
+      </div>
+    </footer>
+  </div>
+
+  <div class="popover examples-pop" id="examplesPop" hidden>
+    <div class="pop-head">
+      <span class="pop-title">示例流程</span>
+      <button type="button" class="icon-btn tiny" data-close-pop aria-label="关闭">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <div class="example-list" id="exampleList"></div>
+    <p class="pop-note">载入示例会替换当前源码，可从提示条中恢复之前的文本。</p>
+  </div>
+
+  <div class="popover style-pop" id="stylePop" hidden>
+    <div class="pop-head">
+      <span class="pop-title">墨水与字体</span>
+      <button type="button" class="icon-btn tiny" data-close-pop aria-label="关闭">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <div>
+      <div class="field">
+        <span class="field-label">图纸样式</span>
+        <div class="theme-grid" id="themeGrid"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="fontSelect">字体</label>
+        <select id="fontSelect">
+          <option value="sans">无衬线 — Arial</option>
+          <option value="serif">衬线 — Georgia</option>
+          <option value="mono">等宽 — Courier</option>
+          <option value="system">系统界面</option>
+        </select>
+      </div>
+
+      <div class="field two-col">
+        <div>
+          <div class="field-label-row"><label class="field-label" for="fontSizeRange">字号</label><output id="fontSizeOut">14</output></div>
+          <input type="range" id="fontSizeRange" min="10" max="24" step="1" value="14">
+        </div>
+        <div>
+          <div class="field-label-row"><label class="field-label" for="lineWidthRange">线宽</label><output id="lineWidthOut">3</output></div>
+          <input type="range" id="lineWidthRange" min="1" max="6" step="1" value="3">
+        </div>
+      </div>
+
+      <div class="field two-col">
+        <div>
+          <div class="field-label-row"><label class="field-label" for="lineLengthRange">节点间距</label><output id="lineLengthOut">50</output></div>
+          <input type="range" id="lineLengthRange" min="24" max="90" step="2" value="50">
+        </div>
+        <div>
+          <div class="field-label-row"><label class="field-label" for="textMarginRange">内边距</label><output id="textMarginOut">10</output></div>
+          <input type="range" id="textMarginRange" min="4" max="24" step="1" value="10">
+        </div>
+      </div>
+
+      <div class="field two-col">
+        <div>
+          <label class="field-label" for="arrowSelect">箭头样式</label>
+          <select id="arrowSelect">
+            <option value="classic">经典</option>
+            <option value="block">方块</option>
+            <option value="classic-wide-long">宽长</option>
+            <option value="oval">椭圆</option>
+          </select>
+        </div>
+        <div>
+          <span class="field-label">分支标签</span>
+          <div class="inline-inputs">
+            <input id="yesInput" value="是" aria-label="“是”分支标签" spellcheck="false">
+            <input id="noInput" value="否" aria-label="“否”分支标签" spellcheck="false">
+          </div>
+        </div>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="animateToggle" checked>
+        <span>播放绘制动画</span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="jumpsToggle" checked>
+        <span>连线交叉处显示跨线弯</span>
+      </label>
+
+      <div class="pop-foot">
+        <button type="button" class="btn ghost small" id="resetStyleBtn">
+          <svg class="icon"><use href="#i-reset"/></svg>重置样式
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="popover" id="insertPop" hidden>
+    <div class="pop-head">
+      <span class="pop-title">插入节点</span>
+      <button type="button" class="icon-btn tiny" data-close-pop aria-label="关闭">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <div class="insert-list" id="insertList"></div>
+  </div>
+
+  <dialog class="dialog export-dialog" id="exportDialog" aria-labelledby="exportTitle">
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow">导出</p>
+        <h2 id="exportTitle">把这张图纸带走</h2>
+      </div>
+      <button type="button" class="icon-btn" data-close-dialog aria-label="关闭">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="field">
+        <span class="field-label">格式</span>
+        <div class="seg" id="formatSeg" role="radiogroup" aria-label="导出格式">
+          <button type="button" role="radio" data-format="svg" aria-checked="false">SVG</button>
+          <button type="button" role="radio" data-format="png" aria-checked="true">PNG</button>
+          <button type="button" role="radio" data-format="jpeg" aria-checked="false">JPEG</button>
+        </div>
+        <p class="field-note" id="formatNote">可带透明或纸张背景的位图。</p>
+      </div>
+
+      <div class="field" id="scaleField">
+        <span class="field-label">分辨率</span>
+        <div class="seg" id="scaleSeg" role="radiogroup" aria-label="导出分辨率">
+          <button type="button" role="radio" data-scale="1" aria-checked="false">1×</button>
+          <button type="button" role="radio" data-scale="2" aria-checked="true">2×</button>
+          <button type="button" role="radio" data-scale="3" aria-checked="false">3×</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">背景</span>
+        <div class="seg" id="bgSeg" role="radiogroup" aria-label="导出背景">
+          <button type="button" role="radio" data-bg="sheet" aria-checked="true">图纸</button>
+          <button type="button" role="radio" data-bg="transparent" aria-checked="false">透明</button>
+          <button type="button" role="radio" data-bg="white" aria-checked="false">白色</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label-row">
+          <label class="field-label" for="padRange">边距</label>
+          <output id="padOut">24 px</output>
+        </div>
+        <input type="range" id="padRange" min="0" max="96" step="4" value="24">
+      </div>
+
+      <label class="check" id="linksCheck">
+        <input type="checkbox" id="keepLinks" checked>
+        <span>在 SVG 中保留超链接</span>
+      </label>
+
+      <div class="export-summary">
+        <span class="summary-label">输出</span>
+        <strong id="exportSize">—</strong>
+        <span id="exportNote">—</span>
+      </div>
+    </div>
+
+    <div class="dialog-foot">
+      <button type="button" class="btn ghost" id="copyBtn">
+        <svg class="icon"><use href="#i-copy"/></svg>复制
+      </button>
+      <button type="button" class="btn primary" id="downloadBtn">
+        <svg class="icon"><use href="#i-download"/></svg>下载
+      </button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog syntax-dialog" id="syntaxDialog" aria-labelledby="syntaxTitle">
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow">参考</p>
+        <h2 id="syntaxTitle">flowchart.js 语法</h2>
+      </div>
+      <button type="button" class="icon-btn" data-close-dialog aria-label="关闭">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="syntax-layout">
+        <section>
+          <h3 class="syntax-h">节点 <span>9 种</span></h3>
+          <div class="node-table">
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><rect x="4" y="5" width="32" height="14" rx="7"/></svg>
+              <div class="node-info"><code>start</code><span>流程的起点。</span></div>
+              <button type="button" class="mini-btn" data-insert="start">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><rect x="4" y="5" width="32" height="14" rx="7" class="fill-soft"/></svg>
+              <div class="node-info"><code>end</code><span>流程的终点。</span></div>
+              <button type="button" class="mini-btn" data-insert="end">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><rect x="4" y="5" width="32" height="14"/></svg>
+              <div class="node-info"><code>operation</code><span>一个步骤或动作。</span></div>
+              <button type="button" class="mini-btn" data-insert="operation">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><path d="M10 5h28l-8 14H2z"/></svg>
+              <div class="node-info"><code>inputoutput</code><span>数据的输入或输出。</span></div>
+              <button type="button" class="mini-btn" data-insert="inputoutput">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><path d="M8 5h28l-4 14H4z"/></svg>
+              <div class="node-info"><code>input</code><span>仅用于输入。</span></div>
+              <button type="button" class="mini-btn" data-insert="input">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><path d="M4 5h28l4 14H8z"/></svg>
+              <div class="node-info"><code>output</code><span>仅用于输出。</span></div>
+              <button type="button" class="mini-btn" data-insert="output">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><rect x="4" y="5" width="32" height="14"/><path d="M9 5v14M31 5v14"/></svg>
+              <div class="node-info"><code>subroutine</code><span>嵌套的子流程。</span></div>
+              <button type="button" class="mini-btn" data-insert="subroutine">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><path d="M20 3l17 9-17 9L3 12z"/></svg>
+              <div class="node-info"><code>condition</code><span>是 / 否分支。</span></div>
+              <button type="button" class="mini-btn" data-insert="condition">插入</button>
+            </div>
+            <div class="node-row">
+              <svg class="node-glyph" viewBox="0 0 40 24" aria-hidden="true"><rect x="4" y="5" width="32" height="14"/><path d="M15 5v14M25 5v14"/></svg>
+              <div class="node-info"><code>parallel</code><span>拆分为多条路径。</span></div>
+              <button type="button" class="mini-btn" data-insert="parallel">插入</button>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 class="syntax-h">连接</h3>
+          <pre class="code-block">st-&gt;op1-&gt;cond
+cond(yes, right)-&gt;io
+cond(no)-&gt;para
+para(path1, bottom)-&gt;sub1</pre>
+          <p class="syntax-note">用 <code>-&gt;</code> 串联节点。条件节点使用 <code>yes</code> 或 <code>no</code>；并行节点使用 <code>path1</code>、<code>path2</code> 或 <code>path3</code>。</p>
+
+          <h3 class="syntax-h">方向</h3>
+          <div class="chip-row"><code>left</code><code>right</code><code>top</code><code>bottom</code></div>
+
+          <h3 class="syntax-h">文本、链接与状态</h3>
+          <pre class="code-block">op=&gt;operation: 第一行
+标签的第二行
+op=&gt;operation: 文档:&gt;https://example.com[blank]
+op=&gt;operation: 步骤|current</pre>
+          <p class="syntax-note">节点标签可以延续到下一行。用 <code>|state</code> 为其上色，用 <code>:&gt;url</code> 添加链接。</p>
+
+          <h3 class="syntax-h">流程状态</h3>
+          <div class="chip-row"><code>past</code><code>current</code><code>future</code><code>approved</code><code>rejected</code><code>invalid</code></div>
+
+          <h3 class="syntax-h">强调路径</h3>
+          <pre class="code-block">st@&gt;op1({"stroke":"#E4572E"})
+  @&gt;cond({"stroke-width":6})</pre>
+          <p class="syntax-note">样式行接受任意 Raphael 属性的 JSON。每条路径写一行。</p>
+
+          <h3 class="syntax-h">注释</h3>
+          <p class="syntax-note">以 <code>//</code> 或 <code>#</code> 开头的行会在绘制前被 Plotter 移除。flowchart.js 本身没有注释语法。</p>
+        </section>
+      </div>
+    </div>
+
+    <div class="dialog-foot">
+      <span class="foot-note">节点名只能是一个单词，标签写在冒号之后。</span>
+      <button type="button" class="btn primary" data-close-dialog>完成</button>
+    </div>
+  </dialog>
+
+  <div class="edge-toolbar multi" id="edgeToolbar" hidden>
+    <label class="edge-port-field">起点
+      <select id="edgeFromPort" aria-label="连线起点所在的边">
+        <option value="top">上</option>
+        <option value="right">右</option>
+        <option value="bottom">下</option>
+        <option value="left">左</option>
+      </select>
+    </label>
+    <label class="edge-port-field">终点
+      <select id="edgeToPort" aria-label="连线终点所在的边">
+        <option value="top">上</option>
+        <option value="right">右</option>
+        <option value="bottom">下</option>
+        <option value="left">左</option>
+      </select>
+    </label>
+    <span class="edge-toolbar-sep" aria-hidden="true"></span>
+    <button type="button" id="edgeSimplifyBtn" title="消除微小折角并简化折点">简化折点</button>
+    <button type="button" id="edgeAutoBtn" title="恢复自动避障路由">自动路由</button>
+    <button type="button" id="edgeDeleteBtn" class="danger" title="从图纸隐藏该连线，不改动源码 (Delete)">删除连线</button>
+  </div>
+
+  <div class="edge-toolbar multi" id="nodeToolbar" hidden>
+    <button type="button" id="distributeHBtn">水平等距</button>
+    <button type="button" id="distributeVBtn">垂直等距</button>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+  <input type="file" id="fileInput" accept=".flow,.fchart,.txt,.md,text/plain" hidden>
+
+  <script src="vendor/raphael.min.js"></script>
+  <script src="vendor/flowchart.min.js"></script>
+  <script src="js/lint.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
