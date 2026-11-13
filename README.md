@@ -4,8 +4,12 @@
 
 写代码，实时出图；拖节点，改连线；换主题，导出 SVG / PNG / JPEG。
 
+**在线体验：<https://rdh4451.github.io/flowchart.js-plotter/>** —— 不用安装，打开浏览器就能用。
+
 <p>
+  <a href="https://rdh4451.github.io/flowchart.js-plotter/"><img alt="Live demo" src="https://img.shields.io/badge/demo-online-2f5b33?style=flat-square"></a>
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-e4572e?style=flat-square">
+  <a href="https://github.com/RDH4451/flowchart.js-plotter/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/RDH4451/flowchart.js-plotter?style=flat-square&amp;color=f0b429"></a>
   <img alt="No build step" src="https://img.shields.io/badge/build-none-1b1e17?style=flat-square">
   <img alt="Vanilla JavaScript" src="https://img.shields.io/badge/JavaScript-vanilla-f0b429?style=flat-square">
   <img alt="Offline ready" src="https://img.shields.io/badge/offline-ready-2f5b33?style=flat-square">
@@ -22,7 +26,28 @@ Plotter 是一个面向 [flowchart.js](https://github.com/adrai/flowchart.js) DS
 
 它不需要安装依赖，不需要构建，也不会上传你的源码。双击 `index.html` 就能用，或者把整个目录放到 GitHub Pages、任意静态服务器上。
 
+不想下载？直接打开 [在线演示](https://rdh4451.github.io/flowchart.js-plotter/) 就能体验，功能和本地版完全一致。
+
 > Plotter 是 flowchart.js 的非官方配套工具，与上游项目没有隶属关系。
+
+## 目录
+
+- [为什么用它](#为什么用它)
+- [功能特性](#功能特性)
+- [快速开始](#快速开始)
+- [界面导览](#界面导览)
+- [使用指南](#使用指南)
+- [快捷键](#快捷键)
+- [flowchart.js 语法速查](#flowchartjs-语法速查)
+- [项目结构](#项目结构)
+- [技术实现](#技术实现)
+- [数据与隐私](#数据与隐私)
+- [已知限制](#已知限制)
+- [尚未实现](#尚未实现)
+- [浏览器支持](#浏览器支持)
+- [开发与贡献](#开发与贡献)
+- [常见问题](#常见问题)
+- [许可证与致谢](#许可证与致谢)
 
 ## 为什么用它
 
@@ -93,9 +118,17 @@ Plotter 是一个面向 [flowchart.js](https://github.com/adrai/flowchart.js) DS
 
 ## 快速开始
 
-### 直接打开
+### 在线使用
 
-下载或 clone 本仓库，双击 `index.html`。应用不依赖服务器，`file://` 也能运行。如果浏览器限制了本地文件访问，改用下面的本地服务器。
+打开 <https://rdh4451.github.io/flowchart.js-plotter/>，不需要下载、安装或登录。这是本仓库 `main` 分支通过 GitHub Pages 自动部署的版本，和本地版完全一致。
+
+### 本地打开
+
+```bash
+git clone https://github.com/RDH4451/flowchart.js-plotter.git
+```
+
+下载或 clone 后双击 `index.html`。应用不依赖服务器，`file://` 也能运行。如果浏览器限制了本地文件访问，改用下面的本地服务器。
 
 ### 本地服务器
 
@@ -110,6 +143,10 @@ npx serve .
 然后打开 <http://localhost:8000/>。
 
 ### 部署到 GitHub Pages
+
+本仓库已经启用 Pages，每次推送 `main` 都会自动重新构建并发布到 <https://rdh4451.github.io/flowchart.js-plotter/>。
+
+Fork 或复制本仓库后，按下面的步骤启用你自己的站点：
 
 1. 把仓库推送到 GitHub。
 2. 打开 **Settings → Pages → Build and deployment**。
@@ -378,7 +415,9 @@ st@>op({"stroke":"#e4572e"})@>e({"stroke-width":6})
 4. 导出 SVG、PNG（透明/图纸）和 JPEG 各一次。
 5. 窄屏下“代码/图纸”切换正常。
 
-欢迎 issue 和 PR。请尽量保持“无构建、无运行时外部依赖、离线可用”的约束，并在 PR 里附上复现步骤和浏览器版本。
+欢迎 [issue](https://github.com/RDH4451/flowchart.js-plotter/issues) 和 [PR](https://github.com/RDH4451/flowchart.js-plotter/pulls)。请尽量保持“无构建、无运行时外部依赖、离线可用”的约束，并在 PR 里附上复现步骤和浏览器版本。
+
+如果这个项目对你有帮助，欢迎点一个 ⭐ Star，或把[在线版](https://rdh4451.github.io/flowchart.js-plotter/)分享给需要画流程图的人。
 
 ## 常见问题
 
@@ -425,4 +464,17 @@ Plotter 的原创代码以 [MIT License](LICENSE) 发布。
 
 Plotter is a static, offline-first editor for the [flowchart.js](https://github.com/adrai/flowchart.js) DSL. Write a diagram as text on the left, get a live SVG preview on the right, adjust nodes and connectors directly, switch between five sheet themes, and export SVG, PNG, or JPEG.
 
+**Try it online: <https://rdh4451.github.io/flowchart.js-plotter/>**
+
 It runs from `index.html` with no build step, no backend, and no network requests. The UI is Simplified Chinese; flowchart.js keywords stay in English. MIT licensed. Not affiliated with or endorsed by the upstream flowchart.js project.
+
+```bash
+git clone https://github.com/RDH4451/flowchart.js-plotter.git
+```
+
+<p align="center">
+  <a href="https://rdh4451.github.io/flowchart.js-plotter/">在线体验 Live demo</a> ·
+  <a href="https://github.com/RDH4451/flowchart.js-plotter">源码 Source</a> ·
+  <a href="https://github.com/RDH4451/flowchart.js-plotter/issues">问题反馈 Issues</a> ·
+  <a href="LICENSE">MIT License</a>
+</p>
