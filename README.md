@@ -142,19 +142,6 @@ npx serve .
 
 然后打开 <http://localhost:8000/>。
 
-### 部署到 GitHub Pages
-
-本仓库已经启用 Pages，每次推送 `main` 都会自动重新构建并发布到 <https://rdh4451.github.io/flowchart.js-plotter/>。
-
-Fork 或复制本仓库后，按下面的步骤启用你自己的站点：
-
-1. 把仓库推送到 GitHub。
-2. 打开 **Settings → Pages → Build and deployment**。
-3. Source 选择 **Deploy from a branch**，分支选 `main`，目录选 `/ (root)`，保存。
-4. 等 Pages 构建完成，访问 `https://<用户名>.github.io/<仓库名>/`。
-
-仓库已经包含 `.nojekyll`，不需要额外配置。
-
 ## 界面导览
 
 | 区域 | 能做什么 |
@@ -378,19 +365,6 @@ st@>op({"stroke":"#e4572e"})@>e({"stroke-width":6})
 - 图纸不支持纯键盘编辑。
 - 界面只有简体中文。
 - 没有自动化测试，校验和路由主要靠手动验证。
-
-## 尚未实现
-
-- 多文档或标签页。
-- 账号、云同步、协作。
-- 从 Mermaid、PlantUML、Graphviz 或 draw.io 导入。
-- PDF 导出。
-- 主题、字体或窗口变化后的自动重排。
-- 主题、样式和导出设置的撤销。
-- flowchart.js 之外的自定义节点形状。
-- 纯键盘的画布编辑。
-- 简体中文之外的语言。
-- 服务端渲染或 CLI。
 
 ## 浏览器支持
 
